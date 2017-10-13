@@ -1,7 +1,8 @@
 import { IPersonaProps, PersonaPresence } from 'office-ui-fabric-react/lib/Persona';
+import { IExtendedPersonaProps } from '../PeoplePickerItems/PeoplePickerItem.Props';
 import { TestImages } from '../../../../common/TestImages';
 
-export const people: (IPersonaProps & { key: string | number })[] = [
+export const people: (IExtendedPersonaProps & { key: string | number })[] = [
   {
     key: 1,
     imageUrl: TestImages.personaFemale,
@@ -402,7 +403,25 @@ export const people: (IPersonaProps & { key: string | number })[] = [
     tertiaryText: 'In a meeting',
     optionalText: 'Available at 4:00pm',
     presence: PersonaPresence.online
-  }
+  },
+  {
+    key: 41,
+    imageUrl: './images/persona-male.png',
+    imageInitials: 'GO',
+    primaryText: 'Group One',
+    canExpand: true,
+  },
+  {
+    key: 42,
+    imageUrl: './images/persona-male.png',
+    imageInitials: 'GT',
+    primaryText: 'Group Two',
+    canExpand: true,
+  },
 ];
 
-export const mru: IPersonaProps[] = people.slice(0, 5);
+export const mru: IExtendedPersonaProps[] = people.slice(0, 5);
+
+export const groupOne: IExtendedPersonaProps[] = people.slice(6, 10);
+
+export const groupTwo: IExtendedPersonaProps[] = people.slice(11, 16);

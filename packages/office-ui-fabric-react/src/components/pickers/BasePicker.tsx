@@ -154,6 +154,7 @@ export class BasePicker<T, P extends IBasePickerProps<T>> extends BaseComponent<
           'ms-BasePicker',
           className ? className : '') }
         onKeyDown={ this.onKeyDown }
+        onCopy={ this.onCopy }
       >
         <FocusZone
           ref={ this._resolveRef('focusZone') }
@@ -484,6 +485,11 @@ export class BasePicker<T, P extends IBasePickerProps<T>> extends BaseComponent<
   }
 
   @autobind
+  protected onCopy(ev: React.ClipboardEvent<HTMLElement>) {
+
+  }
+
+  @autobind
   protected onItemChange(changedItem: T, index: number) {
     let { items } = this.state;
 
@@ -572,6 +578,12 @@ export class BasePicker<T, P extends IBasePickerProps<T>> extends BaseComponent<
     this._updateSelectedItems(newItems, index);
   }
 
+  protected addItems(itemsToAdd: any[]) {
+    let { items } = this.state;
+    let newItems: T[] = items.concat(itemsToAdd);
+    this._updateSelectedItems(newItems);
+  }
+
   // This is protected because we may expect the backspace key to work differently in a different kind of picker.
   // This lets the subclass override it and provide it's own onBackspace. For an example see the BasePickerListBelow
   protected onBackspace(ev: React.KeyboardEvent<HTMLElement>) {
@@ -606,7 +618,7 @@ export class BasePicker<T, P extends IBasePickerProps<T>> extends BaseComponent<
    * Controls what happens whenever there is an action that impacts the selected items.
    * If selectedItems is provided as a property then this will act as a controlled component and it will not update it's own state.
   */
-  private _updateSelectedItems(items: T[], focusIndex?: number) {
+  protected _updateSelectedItems(items: T[], focusIndex?: number) {
     if (this.props.selectedItems) {
       // If the component is a controlled component then the controlling component will need
       this.onChange(items);

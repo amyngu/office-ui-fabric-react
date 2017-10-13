@@ -18,8 +18,8 @@ import {
   ValidationState
 } from 'office-ui-fabric-react/lib/Pickers';
 import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
-import { IPersonaWithMenu } from 'office-ui-fabric-react/lib/components/pickers/PeoplePicker/PeoplePickerItems/PeoplePickerItem.Props';
-import { people, mru } from './PeoplePickerExampleData';
+import { IPersonaWithMenu, IPeoplePickerItemProps, IExtendedPersonaProps } from 'office-ui-fabric-react/lib/components/pickers/PeoplePicker/PeoplePickerItems/PeoplePickerItem.Props';
+import { people, mru, groupOne, groupTwo } from './PeoplePickerExampleData';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Promise } from 'es6-promise';
 import './PeoplePicker.Types.Example.scss';
@@ -158,6 +158,8 @@ export class PeoplePickerTypesExample extends BaseComponent<any, IPeoplePickerEx
   private _renderNormalPicker() {
     return (
       <NormalPeoplePicker
+        onCopyItems={ this._onCopyItems }
+        onExpandGroup={ this._onExpandItem }
         onResolveSuggestions={ this._onFilterChanged }
         onEmptyInputFocus={ this._returnMostRecentlyUsed }
         getTextFromItem={ this._getTextFromItem }
@@ -339,6 +341,21 @@ export class PeoplePickerTypesExample extends BaseComponent<any, IPeoplePickerEx
       let newSuggestedPeople: IPersonaProps[] = mruState.slice(0, indexMostRecentlyUsed).concat(mruState.slice(indexMostRecentlyUsed + 1));
       this.setState({ mostRecentlyUsed: newSuggestedPeople });
     }
+  }
+
+  @autobind
+  private _onExpandItem(item: IPeoplePickerItemProps): void {
+    (this._picker as NormalPeoplePicker).onExpandItem(item, groupOne);
+  }
+
+  @autobind
+  private _onCopyItems(items: IExtendedPersonaProps[]): string {
+    let copyText = '';
+    items.forEach((item: IExtendedPersonaProps) => {
+      copyText += item.primaryText + ', ';
+    });
+
+    return copyText;
   }
 
   @autobind
