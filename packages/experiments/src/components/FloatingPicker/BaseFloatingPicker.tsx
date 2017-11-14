@@ -37,6 +37,8 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
   // tslint:disable-next-line:no-any
   protected currentPromise: PromiseLike<any>;
 
+  protected timer: number | undefined;
+
   constructor(basePickerProps: P) {
     super(basePickerProps);
 
@@ -53,6 +55,10 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
 
   public get isSuggestionsShown(): boolean {
     return this.state.suggestionsVisible ? false : this.state.suggestionsVisible as boolean;
+  }
+
+  public get highlightedSuggestionIndex(): number {
+    return this.suggestionStore.currentIndex;
   }
 
   public onQueryStringChanged(queryString: string): void {
@@ -76,7 +82,6 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
     this.setState({
       suggestionsVisible: false,
     });
-    console.log('hidepicker');
   }
 
   public showPicker(): void {
@@ -192,11 +197,21 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
   }
 
   protected updateValue(updatedValue: string): void {
-    let suggestions: T[] | PromiseLike<T[]> = this.props.onResolveSuggestions(
-      updatedValue,
-      this.props.selectedItems
-    );
-    this.updateSuggestionsList(suggestions, updatedValue);
+    if (this.props.onInputChanged) {
+      this.props.onInputChanged(updatedValue);
+    }
+
+    if (this.props.resolveDelay) {
+      if (this.timer) {
+        this._async.clearTimeout(this.timer);
+        this.timer = undefined;
+      }
+
+      this.timer = this._async.setTimeout(() => this._onResolveSuggestions(updatedValue), this.props.resolveDelay as number);
+
+    } else {
+      this._onResolveSuggestions(updatedValue);
+    }
   }
 
   protected updateSuggestionWithZeroState(): void {
@@ -336,6 +351,7 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
       case KeyCodes.enter:
         if (
           !ev.shiftKey &&
+          !ev.ctrlKey &&
           this.suggestionStore.hasSelectedSuggestion()) {
           this.completeSuggestion();
           ev.preventDefault();
@@ -424,6 +440,10 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
               this.setState({ isSearching: false });
             });
           }
+
+          if (this.props.inputElement) {
+            (this.props.inputElement as HTMLDivElement).focus();
+          }
         } else {
           this.setState({ isSearching: false });
         }
@@ -433,6 +453,17 @@ export class BaseFloatingPicker<T, P extends IBaseFloatingPickerProps<T>> extend
         });
       }
     );
+  }
+
+  private _onResolveSuggestions(updatedValue: string): void {
+    let suggestions: T[] | PromiseLike<T[]> | undefined = this.props.onResolveSuggestions(
+      updatedValue,
+      this.props.selectedItems
+    );
+
+    if (suggestions) {
+      this.updateSuggestionsList(suggestions, updatedValue);
+    }
   }
 
   private _onValidateInput(): void {

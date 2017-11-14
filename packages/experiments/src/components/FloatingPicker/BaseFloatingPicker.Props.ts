@@ -41,11 +41,25 @@ export interface IBaseFloatingPickerProps<T> extends React.Props<any> {
    */
   // tslint:disable-next-line:no-any
   onRenderSuggestionsItem?: (props: T, itemProps: any) => JSX.Element;
+
   /**
-   * A callback for what should happen when a person types text into the input.
+   * A callback for what should happen to resolve the given text in the input.
    * Returns the already selected items so the resolver can filter them out.
+   * If used in conjunction with resolveDelay this will ony kick off after the delay throttle.
    */
-  onResolveSuggestions: (filter: string, selectedItems?: T[]) => T[] | PromiseLike<T[]>;
+  onResolveSuggestions: (filter: string, selectedItems?: T[]) => T[] | PromiseLike<T[]> | undefined;
+
+  /**
+   * A callback for when the input has been changed
+   */
+  onInputChanged?: (filter: string) => void;
+
+  /**
+   * The delay time in ms before resolving suggestions, which is kicked off when input has been changed.
+   * If a second input change happens within the resolveDelay time, the timer with start over.
+   * Only until after the timer times out will onResolveSuggestions be called.
+   */
+  resolveDelay?: number;
 
   /**
    * A callback for when a suggestion is clicked
