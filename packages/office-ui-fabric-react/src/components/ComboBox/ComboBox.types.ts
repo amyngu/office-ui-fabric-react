@@ -53,6 +53,11 @@ export interface IComboBoxProps extends ISelectableDroppableTextProps<IComboBox>
   onMenuOpen?: () => void;
 
   /**
+   * Function that gets invoked when the ComboBox menu is dismissed
+   */
+  onMenuDismissed?: () => void;
+
+  /**
    * Callback issued when the options should be resolved, if they have been updated or
    * if they need to be passed in the first time
    */
@@ -117,6 +122,16 @@ export interface IComboBoxProps extends ISelectableDroppableTextProps<IComboBox>
    * Add additional content below the callout list.
    */
   onRenderLowerContent?: IRenderFunction<IComboBoxProps>;
+
+  /**
+  * Custom width for dropdown (unless useComboBoxAsMenuWidth is undefined or false)
+  */
+  dropdownWidth?: number;
+
+  /**
+   * Whether to use the ComboBoxes width as the menu's width
+   */
+  useComboBoxAsMenuWidth?: boolean;
 }
 
 export interface IComboBoxStyles {
@@ -155,6 +170,12 @@ export interface IComboBoxStyles {
    * the comboBox is disabled.
    */
   rootHovered: IStyle;
+
+  /**
+   * Styles for when the ComboBox is active. These styles are applied for all comboBoxes except when
+   * the comboBox is disabled.
+   */
+  rootPressed: IStyle;
 
   /**
    * Styles for when the ComboBox is focused. These styles are applied for all comboBoxes except when

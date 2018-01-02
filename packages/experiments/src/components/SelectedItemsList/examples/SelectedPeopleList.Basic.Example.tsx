@@ -7,13 +7,8 @@ import {
 } from 'office-ui-fabric-react/lib/Utilities';
 import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { people, groupOne, groupTwo } from 'experiments/lib/ExtendedPicker';
-<<<<<<< HEAD
-import '../../../../../office-ui-fabric-react/src/components/Pickers/PeoplePicker/examples/PeoplePicker.Types.Example.scss';
 import { IBaseSelectedItemsListProps } from '../BaseSelectedItemsList.Props';
-=======
 import 'office-ui-fabric-react/lib/components/Pickers/PeoplePicker/examples/PeoplePicker.Types.Example.scss';
-import { IBaseSelectedItemsListProps } from '../BaseSelectedItemsList.types';
->>>>>>> master
 import { IExtendedPersonaProps, SelectedPeopleList } from '../SelectedPeopleList/SelectedPeopleList';
 
 export class PeopleSelectedItemsListExample extends BaseComponent<IBaseSelectedItemsListProps<IExtendedPersonaProps>, {}> {
