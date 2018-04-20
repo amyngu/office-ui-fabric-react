@@ -1,6 +1,10 @@
-import * as React from 'react';
-import { IPickerItemProps, ISuggestionModel, ValidationState } from 'office-ui-fabric-react/lib/Pickers';
-import { Selection } from 'office-ui-fabric-react/lib/Selection';
+import * as React from "react";
+import {
+  IPickerItemProps,
+  ISuggestionModel,
+  ValidationState
+} from "office-ui-fabric-react/lib/Pickers";
+import { Selection } from "office-ui-fabric-react/lib/Selection";
 
 export interface IBaseSelectedItemsList<T> {
   /** Gets the current value of the input. */
@@ -46,7 +50,10 @@ export interface IBaseSelectedItemsListProps<T> extends React.Props<any> {
   /**
    * Function that specifies how arbitrary text entered into the well is handled.
    */
-  createGenericItem?: (input: string, ValidationState: ValidationState) => ISuggestionModel<T>;
+  createGenericItem?: (
+    input: string,
+    ValidationState: ValidationState
+  ) => ISuggestionModel<T>;
   /**
    * A callback to process a selection after the user selects something from the picker.
    */
@@ -58,8 +65,13 @@ export interface IBaseSelectedItemsListProps<T> extends React.Props<any> {
   selectedItems?: T[];
 
   /**
-  * Aria label for the 'X' button in the selected item component.
-  * @default ''
-  */
+   * Aria label for the 'X' button in the selected item component.
+   * @default ''
+   */
   removeButtonAriaLabel?: string;
+
+  /**
+   * A callback when and item is deleted
+   */
+  onItemDeleted?: (deletedItem: T) => void;
 }

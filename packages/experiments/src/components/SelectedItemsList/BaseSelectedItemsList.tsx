@@ -1,11 +1,12 @@
-import * as React from 'react';
-import {
-  BaseComponent,
-  KeyCodes
-} from '../../Utilities';
-import { Selection } from 'office-ui-fabric-react/lib/Selection';
+import * as React from "react";
+import { BaseComponent, KeyCodes } from "../../Utilities";
+import { Selection } from "office-ui-fabric-react/lib/Selection";
 
-import { IBaseSelectedItemsList, IBaseSelectedItemsListProps, ISelectedItemProps } from './BaseSelectedItemsList.types';
+import {
+  IBaseSelectedItemsList,
+  IBaseSelectedItemsListProps,
+  ISelectedItemProps
+} from "./BaseSelectedItemsList.types";
 
 export interface IBaseSelectedItemsListState {
   // tslint:disable-next-line:no-any
@@ -20,22 +21,25 @@ export interface IBaseSelectedItemsListState {
 }
 
 export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
-  extends BaseComponent<P, IBaseSelectedItemsListState> implements IBaseSelectedItemsList<T> {
-
+  extends BaseComponent<P, IBaseSelectedItemsListState>
+  implements IBaseSelectedItemsList<T> {
   protected root: HTMLElement;
   protected selection: Selection;
 
   constructor(basePickerProps: P) {
     super(basePickerProps);
 
-    const items: T[] = basePickerProps.selectedItems || basePickerProps.defaultSelectedItems || [];
+    const items: T[] =
+      basePickerProps.selectedItems ||
+      basePickerProps.defaultSelectedItems ||
+      [];
     this.state = {
-      items: items,
+      items: items
     };
 
     // Create a new selection if one is not specified
     this.selection = this.props.selection
-      ? this.props.selection as Selection
+      ? (this.props.selection as Selection)
       : new Selection({ onSelectionChanged: this.onSelectionChanged });
   }
 
@@ -45,10 +49,14 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
 
   public addItems = (items: T[]): void => {
     // tslint:disable-next-line:no-any
-    const processedItems: T[] | PromiseLike<T[]> = this.props.onItemSelected ? (this.props.onItemSelected as any)(items) : items;
+    const processedItems: T[] | PromiseLike<T[]> = this.props.onItemSelected
+      ? (this.props.onItemSelected as any)(items)
+      : items;
 
     const processedItemObjects: T[] = processedItems as T[];
-    const processedItemPromiseLikes: PromiseLike<T[]> = processedItems as PromiseLike<T[]>;
+    const processedItemPromiseLikes: PromiseLike<
+      T[]
+    > = processedItems as PromiseLike<T[]>;
 
     if (processedItemPromiseLikes && processedItemPromiseLikes.then) {
       processedItemPromiseLikes.then((resolvedProcessedItems: T[]) => {
@@ -59,8 +67,44 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
       const newItems: T[] = this.state.items.concat(processedItemObjects);
       this.updateItems(newItems);
     }
-    this.setState({ suggestedDisplayValue: '' });
-  }
+    this.setState({ suggestedDisplayValue: "" });
+  };
+
+  // tslint:disable-next-line:no-any
+  public removeItems = (itemsToRemove: any[]): void => {
+    const { items } = this.state;
+    // tslint:disable-next-line:no-any
+    const newItems: T[] = items.filter(
+      (item: any) => itemsToRemove.indexOf(item) === -1
+    );
+    const firstItemToRemove = itemsToRemove[0];
+    const index: number = items.indexOf(firstItemToRemove);
+
+    if (this.props.onItemDeleted) {
+      itemsToRemove.forEach((item: T) => {
+        (this.props.onItemDeleted as (item: T) => void)(item);
+      });
+    }
+
+    this.updateItems(newItems, index);
+  };
+
+  public removeItem = (item: ISelectedItemProps<T>): void => {
+    const { items } = this.state;
+    const index: number = items.indexOf(item);
+
+    if (index >= 0) {
+      const newItems: T[] = items
+        .slice(0, index)
+        .concat(items.slice(index + 1));
+
+      if (this.props.onItemDeleted) {
+        (this.props.onItemDeleted as (item: T) => void)(item.item);
+      }
+
+      this.updateItems(newItems);
+    }
+  };
 
   public removeItemAt = (index: number): void => {
     const { items } = this.state;
@@ -69,20 +113,23 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
       const newItems = items.slice(0, index).concat(items.slice(index + 1));
       this.updateItems(newItems);
     }
-  }
+  };
 
   public onCopy = (ev: React.ClipboardEvent<HTMLElement>): void => {
     if (this.props.onCopyItems && this.selection.getSelectedCount() > 0) {
       const selectedItems: T[] = this.selection.getSelection() as T[];
       this.copyItems(selectedItems);
     }
-  }
+  };
 
   public unselectAll(): void {
     this.selection.setAllSelected(false);
   }
 
-  public componentWillUpdate(newProps: P, newState: IBaseSelectedItemsListState): void {
+  public componentWillUpdate(
+    newProps: P,
+    newState: IBaseSelectedItemsListState
+  ): void {
     if (newState.items && newState.items !== this.state.items) {
       this.selection.setItems(newState.items);
     }
@@ -111,25 +158,29 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
 
   protected renderItems = (): JSX.Element[] => {
     const { removeButtonAriaLabel } = this.props;
-    const onRenderItem = this.props.onRenderItem as (props: ISelectedItemProps<T>) => JSX.Element;
+    const onRenderItem = this.props.onRenderItem as (
+      props: ISelectedItemProps<T>
+    ) => JSX.Element;
 
     const { items } = this.state;
     // tslint:disable-next-line:no-any
-    return items.map((item: any, index: number) => onRenderItem({
-      item,
-      index,
-      key: item.key ? item.key : index,
-      selected: this.selection.isIndexSelected(index),
-      onRemoveItem: () => this.removeItem(item),
-      onItemChange: this.onItemChange,
-      removeButtonAriaLabel: removeButtonAriaLabel,
-      onCopyItem: (itemToCopy: T) => this.copyItems([itemToCopy]),
-    }));
-  }
+    return items.map((item: any, index: number) =>
+      onRenderItem({
+        item,
+        index,
+        key: item.key ? item.key : index,
+        selected: this.selection.isIndexSelected(index),
+        onRemoveItem: () => this.removeItem(item),
+        onItemChange: this.onItemChange,
+        removeButtonAriaLabel: removeButtonAriaLabel,
+        onCopyItem: (itemToCopy: T) => this.copyItems([itemToCopy])
+      })
+    );
+  };
 
   protected onSelectionChanged = (): void => {
     this.forceUpdate();
-  }
+  };
 
   protected onChange(items?: T[]): void {
     if (this.props.onChange) {
@@ -147,7 +198,7 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
       case KeyCodes.del:
         this.onBackspace(ev);
     }
-  }
+  };
 
   protected onItemChange = (changedItem: T, index: number): void => {
     const { items } = this.state;
@@ -158,28 +209,7 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
 
       this.updateItems(newItems);
     }
-  }
-
-  protected removeItem = (item: ISelectedItemProps<T>): void => {
-    const { items } = this.state;
-    const index: number = items.indexOf(item);
-
-    if (index >= 0) {
-      const newItems: T[] = items.slice(0, index).concat(items.slice(index + 1));
-      this.updateItems(newItems);
-    }
-  }
-
-  // tslint:disable-next-line:no-any
-  protected removeItems = (itemsToRemove: any[]): void => {
-    const { items } = this.state;
-    // tslint:disable-next-line:no-any
-    const newItems: T[] = items.filter((item: any) => itemsToRemove.indexOf(item) === -1);
-    const firstItemToRemove = itemsToRemove[0];
-    const index: number = items.indexOf(firstItemToRemove);
-
-    this.updateItems(newItems, index);
-  }
+  };
 
   // This is protected because we may expect the backspace key to work differently in a different kind of picker.
   // This lets the subclass override it and provide it's own onBackspace. For an example see the BasePickerListBelow
@@ -196,7 +226,7 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
   /**
    * Controls what happens whenever there is an action that impacts the selected items.
    * If selectedItems is provided as a property then this will act as a controlled component and it will not update it's own state.
-  */
+   */
   protected updateItems(items: T[], focusIndex?: number): void {
     if (this.props.selectedItems) {
       // If the component is a controlled component then the controlling component will need
@@ -213,14 +243,14 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
       // tslint:disable-next-line:no-any
       const copyText = (this.props.onCopyItems as any)(items);
 
-      const copyInput = document.createElement('input') as HTMLInputElement;
+      const copyInput = document.createElement("input") as HTMLInputElement;
       document.body.appendChild(copyInput);
 
       try {
         // Try to copy the text directly to the clipboard
         copyInput.value = copyText;
         copyInput.select();
-        if (!document.execCommand('copy')) {
+        if (!document.execCommand("copy")) {
           // The command failed. Fallback to the method below.
           throw new Error();
         }
@@ -232,7 +262,9 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
     }
   }
 
-  protected _isFocusZoneInnerKeystroke(ev: React.KeyboardEvent<HTMLElement>): boolean {
+  protected _isFocusZoneInnerKeystroke(
+    ev: React.KeyboardEvent<HTMLElement>
+  ): boolean {
     return false;
   }
 
