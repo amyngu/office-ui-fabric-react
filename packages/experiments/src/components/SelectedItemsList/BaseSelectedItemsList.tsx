@@ -115,6 +115,21 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
     }
   };
 
+  /**
+   * Controls what happens whenever there is an action that impacts the selected items.
+   * If selectedItems is provided as a property then this will act as a controlled component and it will not update it's own state.
+   */
+  public updateItems(items: T[], focusIndex?: number): void {
+    if (this.props.selectedItems) {
+      // If the component is a controlled component then the controlling component will need
+      this.onChange(items);
+    } else {
+      this.setState({ items: items }, () => {
+        this._onSelectedItemsUpdated(items, focusIndex);
+      });
+    }
+  }
+
   public onCopy = (ev: React.ClipboardEvent<HTMLElement>): void => {
     if (this.props.onCopyItems && this.selection.getSelectedCount() > 0) {
       const selectedItems: T[] = this.selection.getSelection() as T[];
@@ -220,21 +235,6 @@ export class BaseSelectedItemsList<T, P extends IBaseSelectedItemsListProps<T>>
       } else {
         this.removeItem(this.state.items[this.state.items.length - 1]);
       }
-    }
-  }
-
-  /**
-   * Controls what happens whenever there is an action that impacts the selected items.
-   * If selectedItems is provided as a property then this will act as a controlled component and it will not update it's own state.
-   */
-  protected updateItems(items: T[], focusIndex?: number): void {
-    if (this.props.selectedItems) {
-      // If the component is a controlled component then the controlling component will need
-      this.onChange(items);
-    } else {
-      this.setState({ items: items }, () => {
-        this._onSelectedItemsUpdated(items, focusIndex);
-      });
     }
   }
 
